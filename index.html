@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c50">
+  <title>DayOne | Employee Onboarding</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="login-body">
+  <main class="login-layout">
+    <section class="login-brand">
+      <a class="brand-logo" href="index.html">
+        Day<span>One</span>
+      </a>
+
+      <div>
+        <span class="eyebrow light">YOUR NEXT CHAPTER STARTS HERE</span>
+        <h1>A great first day starts before day one.</h1>
+        <p class="brand-description">
+          Complete your joining tasks, share required documents,
+          and get ready for your first day with one simple workspace.
+        </p>
+      </div>
+
+      <div class="security-note">
+        <strong>One smooth start.</strong><br>
+        A simpler, more connected onboarding experience for
+        candidates and HR teams.
+      </div>
+    </section>
+
+    <section class="login-content">
+      <span class="eyebrow">WELCOME ABOARD</span>
+      <h2>Sign in to DayOne</h2>
+      <p class="muted">Choose your portal to continue.</p>
+
+      <form id="login-form">
+        <div class="role-options">
+          <label class="role-option">
+            <input type="radio" name="login-role"
+                   value="Candidate" checked required>
+            <span class="role-card">
+              <span class="role-icon">👤</span>
+              <strong>Candidate</strong>
+              <small>Complete your onboarding and joining tasks.</small>
+            </span>
+          </label>
+
+          <label class="role-option">
+            <input type="radio" name="login-role"
+                   value="HRAdmin" required>
+            <span class="role-card">
+              <span class="role-icon">🏢</span>
+              <strong>HR administrator</strong>
+              <small>Manage employees and monitor onboarding.</small>
+            </span>
+          </label>
+        </div>
+
+        <div class="field">
+          <label for="email">Work email</label>
+          <input id="email" name="email" type="email"
+                 placeholder="you@company.com"
+                 autocomplete="username" required>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="password-row">
+            <input id="password" name="password" type="password"
+                   placeholder="Enter your password"
+                   autocomplete="current-password" required>
+            <button id="toggle-password" type="button"
+                    class="secondary-button">Show</button>
+          </div>
+        </div>
+
+        <button id="sign-in-button" type="submit"
+                class="primary-button">
+          Sign in →
+        </button>
+
+        <a id="forgot-link" class="forgot-link" href="#">
+          Forgot password?
+        </a>
+
+        <div id="login-message" class="form-message"
+             role="status" aria-live="polite"></div>
+      </form>
+
+      <p class="footer-note">
+        Secure access for candidates and authorized HR administrators.
+        Your portal permissions are verified after authentication.
+      </p>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.15/dist/amazon-cognito-identity.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c50">
+  <title>My Onboarding | DayOne</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand-logo" href="onboarding.html">Day<span>One</span></a>
+      <p>Candidate workspace</p>
+
+      <nav aria-label="Candidate navigation">
+        <a class="nav-link active" href="onboarding.html">My Onboarding</a>
+        <a class="nav-link" href="#journey">My progress</a>
+        <a class="nav-link" href="#documents">My documents</a>
+        <a class="nav-link" href="#policies">Company policies</a>
+        <button id="signout" class="nav-link logout-link" type="button"><span class="logout-icon" aria-hidden="true">↪</span><span>Sign Out</span></button>
+      </nav>
+
+      <div class="sidebar-note">
+        <strong>Need a hand?</strong>
+        <p>Contact your HR team if you have questions about joining.</p>
+        <a href="mailto:hr@example.com">Contact HR →</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">YOUR WORKSPACE</span>
+          <h1>My onboarding</h1>
+          <p>Track your progress and complete your joining tasks.</p>
+        </div>
+        <span class="status progress">Candidate portal</span>
+      </header>
+
+      <section class="welcome-panel">
+        <div>
+          <span class="eyebrow light">WELCOME ABOARD</span>
+          <h2>Your next chapter starts here.</h2>
+          <p>
+            Complete each step at your own pace and get ready
+            for your first day.
+          </p>
+        </div>
+        <div class="welcome-symbol" aria-hidden="true">✦</div>
+      </section>
+
+      <section class="grid-2" id="journey">
+        <article class="card">
+          <p class="muted">Overall completion</p>
+          <h3 id="progress-percent">25%</h3>
+
+          <div class="progress-track">
+            <div id="progress-bar" class="progress-fill"
+                 style="width:25%"></div>
+          </div>
+
+          <p id="progress-caption" class="notice">
+            1 of 4 stages completed. Preview progress until connected to AWS.
+          </p>
+        </article>
+
+        <article class="card">
+          <p class="muted">Joining date</p>
+          <h3 id="joining-date">To be confirmed</h3>
+          <p class="notice">
+            Contact HR if your joining details are incorrect.
+          </p>
+        </article>
+      </section>
+
+      <section class="grid-2">
+        <article class="card">
+          <span class="eyebrow">YOUR CHECKLIST</span>
+          <h2>Onboarding journey</h2>
+
+          <ul id="stage-list" class="stage-list">
+            <li class="stage-item">
+              <span class="stage-dot complete"></span>
+              <div>
+                <strong>Document Collection</strong><br>
+                <span class="status complete">Completed</span>
+              </div>
+            </li>
+            <li class="stage-item">
+              <span class="stage-dot pending"></span>
+              <div>
+                <strong>IT Provisioning</strong><br>
+                <span class="status pending">Pending</span>
+              </div>
+            </li>
+            <li class="stage-item">
+              <span class="stage-dot pending"></span>
+              <div>
+                <strong>Policy Sign-off</strong><br>
+                <span class="status pending">Pending</span>
+              </div>
+            </li>
+            <li class="stage-item">
+              <span class="stage-dot pending"></span>
+              <div>
+                <strong>Manager Introduction</strong><br>
+                <span class="status pending">Pending</span>
+              </div>
+            </li>
+          </ul>
+        </article>
+
+        <div class="stack">
+          <article class="card" id="documents">
+            <span class="eyebrow">REQUIRED DOCUMENTS</span>
+            <h2>Upload your documents</h2>
+            <p class="notice">
+              Accepted formats: PDF, JPG and PNG. Maximum 10 MB per file.
+              Uploads are not complete until the backend confirms success.
+            </p>
+
+            <form id="document-form">
+              <div class="field">
+                <label for="document-type">Document type</label>
+                <select id="document-type" required>
+                  <option value="id-proof">Identity proof</option>
+                  <option value="degree-certificate">Degree certificate</option>
+                  <option value="signed-offer">Signed offer letter</option>
+                </select>
+              </div>
+
+              <div class="upload-box">
+                <div class="field">
+                  <label for="document-file">Choose document</label>
+                  <input id="document-file" type="file"
+                         accept=".pdf,.jpg,.jpeg,.png" required>
+                </div>
+
+                <button class="action-button primary" type="submit">
+                  Upload document
+                </button>
+
+                <p id="document-message" class="form-message"
+                   role="status" aria-live="polite"></p>
+              </div>
+            </form>
+          </article>
+
+          <article class="card" id="policies">
+            <span class="eyebrow">ONE QUICK TASK</span>
+            <h2>Company policies</h2>
+            <p class="notice">
+              Read the applicable company policies before acknowledging them.
+            </p>
+
+            <form id="policy-form">
+              <label class="policy-label">
+                <input id="policy-accepted" type="checkbox" required>
+                <span>
+                  I confirm that I have read and understood the
+                  applicable company policies.
+                </span>
+              </label>
+
+              <button class="action-button primary" type="submit">
+                Acknowledge policy
+              </button>
+
+              <p id="policy-message" class="form-message"
+                 role="status" aria-live="polite"></p>
+            </form>
+          </article>
+        </div>
+      </section>
+
+      <p class="notice security-notice">
+        Do not use real identity documents in a demo environment.
+        Use approved test documents until the AWS upload workflow
+        has been configured and verified.
+      </p>
+
+      <footer class="app-footer">
+        <span>© 2026 DayOne</span>
+        <a href="mailto:hr@example.com">Contact HR</a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.15/dist/amazon-cognito-identity.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/onboarding.js"></script>
+</body>
+</html>

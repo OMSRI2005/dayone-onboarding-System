@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c50">
+  <title>HR Dashboard | DayOne</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand-logo" href="admin.html">Day<span>One</span></a>
+      <p>Human Resources</p>
+
+      <nav aria-label="HR navigation">
+        <a class="nav-link active" href="admin.html">Dashboard</a>
+        <a class="nav-link" href="#employees">Employees</a>
+        <a class="nav-link" href="#employees">Onboarding status</a>
+        <a class="nav-link logout-link" href="index.html" id="logout-link"><span class="logout-icon" aria-hidden="true">↪</span><span>Sign Out</span></a>
+      </nav>
+
+      <div class="sidebar-note">
+        <strong>People operations</strong>
+        <p>Monitor progress and help every new teammate prepare for day one.</p>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">PEOPLE OPERATIONS</span>
+          <h1>HR Dashboard</h1>
+          <p>Monitor employee onboarding and readiness.</p>
+        </div>
+        <button id="refresh-button" class="action-button primary">
+          ↻ Refresh
+        </button>
+      </header>
+
+      <section class="grid-4" aria-label="Employee summary">
+        <article class="card stat-card">
+          <p class="muted">Total employees</p>
+          <h3 id="total-employees">3</h3>
+          <span class="stat-caption">Employee records</span>
+        </article>
+
+        <article class="card stat-card">
+          <p class="muted">In progress</p>
+          <h3 id="in-progress">1</h3>
+          <span class="stat-caption">Onboarding underway</span>
+        </article>
+
+        <article class="card stat-card">
+          <p class="muted">Completed</p>
+          <h3 id="completed-count">1</h3>
+          <span class="stat-caption">All stages completed</span>
+        </article>
+
+        <article class="card stat-card">
+          <p class="muted">Pending review</p>
+          <h3 id="pending-review">1</h3>
+          <span class="stat-caption">Awaiting action</span>
+        </article>
+      </section>
+
+      <section class="card" id="employees">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">YOUR PEOPLE</span>
+            <h2>Employee onboarding</h2>
+            <p class="muted">
+              Search employee records and monitor onboarding progress.
+            </p>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input id="employee-search" type="search"
+                 placeholder="Search name or email"
+                 aria-label="Search employees">
+
+          <select id="status-filter" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Pending">Pending</option>
+          </select>
+
+          <button id="export-button" class="action-button">
+            ↓ Export CSV
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Joining date</th>
+                <th>Status</th>
+                <th>Progress</th>
+              </tr>
+            </thead>
+            <tbody id="employee-table">
+              <tr>
+                <td colspan="6">Checking access and loading employees...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p id="admin-message" class="notice" role="status"
+           aria-live="polite">
+          Employee data will appear here after authentication.
+        </p>
+      </section>
+
+      <footer class="app-footer">
+        <span>© 2026 DayOne</span>
+        <span>A better start, together.</span>
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.15/dist/amazon-cognito-identity.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
