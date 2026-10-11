@@ -71,12 +71,29 @@ Expected upload URL response example:
 ```
 ## Test Login Credentials
 
-Use the following test accounts to verify the Candidate and HR Admin portals during development and testing.
+Use these test accounts to verify both portals during development.
 
-| Role | Test Email | Portal |
+| Role | Email | Password |
 |---|---|---|
-| Candidate | `testing@gmail.com` | Candidate Onboarding Portal |  PW: Testing@123
-| HR Admin | `hr@gmail.com` | HR Dashboard | PW: Hrf13@123
+| Candidate | `testing@gmail.com` | `Testing@123` |
+| HR Admin | `hr@gmail.com` | `Hrf13@123` |
+
+### Testing Instructions
+
+1. Open the DayOne login page.
+2. Select **Candidate** and sign in using the Candidate test account.
+3. Verify the candidate onboarding portal.
+4. Sign out and return to the login page.
+5. Select **HR Admin** and sign in using the HR Admin test account.
+6. Verify the HR dashboard and employee onboarding information.
+
+### Access Control
+
+- Candidate accounts must belong to the `Candidate` Cognito group.
+- HR accounts must belong to the `HRAdmin` Cognito group.
+- Each account should access only its authorized portal.
+
+**Security note:** These are development test credentials only. Do not reuse them for production accounts. Prefer sharing passwords through a secure team channel instead of committing them to Git history.
 
 ### How to Test
 
