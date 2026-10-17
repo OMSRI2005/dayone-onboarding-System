@@ -3,16 +3,38 @@
 
 window.DayOneAPI = (() => {
   const config = window.DAYONE_CONFIG || {};
+  const apiConfig = config.API || {};
+
+  const MAX_FILE_SIZE =
+    config.MAX_FILE_SIZE_BYTES || 5 * 1024 * 1024;
+
+  const ALLOWED_TYPES = new Set(
+    config.ALLOWED_FILE_TYPES || [
+      "application/pdf",
+      "image/jpeg",
+      "image/png"
+    ]
+  );
+
+  const DOCUMENT_TYPE_MAP = Object.freeze({
+    "id-proof": "ID_PROOF",
+    "degree-certificate": "DEGREE_CERTIFICATE",
+    "signed-offer": "SIGNED_OFFER"
+  });
 
   async function getCognitoSession() {
     if (typeof window.DayOneAuth?.getSession !== "function") {
-      throw new Error("Authentication is unavailable. Check js/auth.js.");
+      throw new Error(
+        "Authentication is unavailable. Check js/auth.js."
+      );
     }
 
     const session = await window.DayOneAuth.getSession();
 
     if (!session || !session.isValid()) {
-      throw new Error("Your session has expired. Please sign in again.");
+      throw new Error(
+        "Your session has expired. Please sign in again."
+      );
     }
 
     return session;
@@ -23,19 +45,11 @@ window.DayOneAPI = (() => {
     return session.getIdToken().getJwtToken();
   }
 
-  async function request(path, options = {}) {
-    const baseUrl = config.API_BASE_URL;
-
-    if (!baseUrl) {
-      throw new Error("API Gateway URL is not configured in js/config.js.");
-    }
-
-    if (
-      typeof path !== "string" ||
-      !path.startsWith("/") ||
-      path.startsWith("//")
-    ) {
-      throw new Error("Invalid API endpoint path.");
+  async function requestUrl(url, options = {}) {
+    if (!url) {
+      throw new Error(
+        "The API URL is not configured in js/config.js."
+      );
     }
 
     const token = await getAuthToken();
@@ -47,19 +61,25 @@ window.DayOneAPI = (() => {
       headers.set("Content-Type", "application/json");
     }
 
-    const response = await fetch(
-      baseUrl.replace(/\/+$/, "") + path,
-      { ...options, headers }
-    );
+    let response;
 
-    if (response.status === 401) {
+    try {
+      response = await fetch(url, {
+        ...options,
+        headers
+      });
+    } catch {
       throw new Error(
-        "Authentication failed or your session expired. Please sign in again."
+        "Could not reach the API. Check network access and API CORS settings."
       );
     }
 
+    if (response.status === 401) {
+      throw new Error("Authentication failed. Please sign in again.");
+    }
+
     if (response.status === 403) {
-      throw new Error("Access denied for this operation.");
+      throw new Error("Access denied. Check your account permissions.");
     }
 
     if (!response.ok) {
@@ -69,7 +89,7 @@ window.DayOneAPI = (() => {
         const body = await response.json();
         details = body.message || body.error || "";
       } catch {
-        // The response was not JSON.
+        // The server did not return a JSON error.
       }
 
       throw new Error(
@@ -81,7 +101,8 @@ window.DayOneAPI = (() => {
       return null;
     }
 
-    const contentType = response.headers.get("content-type") || "";
+    const contentType =
+      response.headers.get("content-type") || "";
 
     if (contentType.includes("application/json")) {
       try {
@@ -94,12 +115,72 @@ window.DayOneAPI = (() => {
     return response.text();
   }
 
-  async function getProgress() {
-    return request("/onboarding/progress");
+  async function createEmployee(employee) {
+    if (!employee || typeof employee !== "object") {
+      throw new Error("Employee details are required.");
+    }
+
+    const requiredFields = [
+      "name",
+      "email",
+      "department",
+      "role",
+      "manager",
+      "joining_date",
+      "employment_type"
+    ];
+
+    for (const field of requiredFields) {
+      if (
+        typeof employee[field] !== "string" ||
+        !employee[field].trim()
+      ) {
+        throw new Error(
+          `Please provide ${field.replaceAll("_", " ")}.`
+        );
+      }
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(employee.email.trim())) {
+      throw new Error("Please enter a valid employee email address.");
+    }
+
+    const payload = Object.fromEntries(
+      requiredFields.map(field => [
+        field,
+        employee[field].trim()
+      ])
+    );
+
+    return requestUrl(apiConfig.EMPLOYEES_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
   }
 
   async function getEmployees() {
-    return request("/employees");
+    return requestUrl(apiConfig.EMPLOYEES_URL, {
+      method: "GET"
+    });
+  }
+
+  async function getProgress(employeeId) {
+    if (typeof employeeId !== "string" || !employeeId.trim()) {
+      throw new Error(
+        "An employee ID is required to get onboarding progress."
+      );
+    }
+
+    if (!apiConfig.PROGRESS_URL) {
+      throw new Error("The progress API URL is not configured.");
+    }
+
+    const url = new URL(apiConfig.PROGRESS_URL);
+    url.searchParams.set("employee_id", employeeId.trim());
+
+    return requestUrl(url.toString(), {
+      method: "GET"
+    });
   }
 
   async function completeStage(stage) {
@@ -114,29 +195,28 @@ window.DayOneAPI = (() => {
       throw new Error("Invalid onboarding stage.");
     }
 
-    return request(
-      "/onboarding/stages/" + encodeURIComponent(stage),
-      {
-        method: "POST",
-        body: JSON.stringify({ completed: true })
-      }
+    throw new Error(
+      "The stage-update endpoint has not yet been provided or confirmed."
     );
   }
 
-  async function createUploadUrl(documentType, fileName, contentType) {
-    const allowedTypes = config.ALLOWED_FILE_TYPES || [
-      "application/pdf",
-      "image/jpeg",
-      "image/png"
-    ];
+  // Request a presigned S3 POST from the configured backend.
+  // Endpoint and response schema must be confirmed by Preethi.
+  async function createUploadUrl(
+    documentType,
+    fileName,
+    contentType,
+    employeeId
+  ) {
+    const endpoint = apiConfig.DOCUMENT_UPLOAD_URL;
 
-    const allowedDocuments = [
-      "id-proof",
-      "degree-certificate",
-      "signed-offer"
-    ];
+    if (!endpoint) {
+      throw new Error(
+        "The document upload API URL is not configured yet. Please confirm it with the backend team."
+      );
+    }
 
-    if (!allowedDocuments.includes(documentType)) {
+    if (!Object.hasOwn(DOCUMENT_TYPE_MAP, documentType)) {
       throw new Error("Invalid document type.");
     }
 
@@ -148,46 +228,71 @@ window.DayOneAPI = (() => {
       throw new Error("Enter a valid file name.");
     }
 
-    if (!allowedTypes.includes(contentType)) {
-      throw new Error("Unsupported document file type.");
+    if (!ALLOWED_TYPES.has(contentType)) {
+      throw new Error("Only PDF, JPG/JPEG and PNG files are accepted.");
     }
 
-    return request("/documents/upload-url", {
+    if (
+      typeof employeeId !== "string" ||
+      !employeeId.trim()
+    ) {
+      throw new Error("An employee ID is required for document upload.");
+    }
+
+    // This payload uses descriptive field names. Confirm the exact
+    // field names with Preethi before deploying the integration.
+    const result = await requestUrl(endpoint, {
       method: "POST",
       body: JSON.stringify({
-        documentType,
-        fileName: fileName.trim(),
-        contentType
+        employee_id: employeeId.trim(),
+        document_type: DOCUMENT_TYPE_MAP[documentType],
+        file_name: fileName.trim(),
+        content_type: contentType
       })
     });
+
+    // Expected shape for this implementation:
+    // { upload: { url: "...", fields: { ... } } }
+    if (
+      !result?.upload ||
+      typeof result.upload.url !== "string" ||
+      !result.upload.fields ||
+      typeof result.upload.fields !== "object"
+    ) {
+      throw new Error(
+        "The upload API response format is not recognized. Confirm the response schema with Preethi."
+      );
+    }
+
+    return result.upload;
   }
 
-  async function uploadDocument(uploadUrl, file) {
-    if (!uploadUrl || !file) {
-      throw new Error("An upload URL and file are required.");
+  // Upload using a presigned S3 POST, not PUT.
+  async function uploadDocument(upload, file) {
+    if (!upload || !file) {
+      throw new Error("An upload response and file are required.");
     }
 
-    const allowedTypes = config.ALLOWED_FILE_TYPES || [
-      "application/pdf",
-      "image/jpeg",
-      "image/png"
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
-      throw new Error("Unsupported document file type.");
+    if (!ALLOWED_TYPES.has(file.type)) {
+      throw new Error("Only PDF, JPG/JPEG and PNG files are accepted.");
     }
 
-    const maxSize =
-      config.MAX_FILE_SIZE_BYTES || 10 * 1024 * 1024;
+    if (file.size <= 0 || file.size > MAX_FILE_SIZE) {
+      throw new Error("The file must be larger than 0 bytes and no larger than 5 MB.");
+    }
 
-    if (file.size <= 0 || file.size > maxSize) {
-      throw new Error("The file must be larger than 0 bytes and no larger than 10 MB.");
+    if (
+      typeof upload.url !== "string" ||
+      !upload.fields ||
+      typeof upload.fields !== "object"
+    ) {
+      throw new Error("The backend returned an invalid presigned POST.");
     }
 
     let parsedUrl;
 
     try {
-      parsedUrl = new URL(uploadUrl);
+      parsedUrl = new URL(upload.url);
     } catch {
       throw new Error("The backend returned an invalid upload URL.");
     }
@@ -196,14 +301,33 @@ window.DayOneAPI = (() => {
       throw new Error("Document uploads must use HTTPS.");
     }
 
-    const response = await fetch(uploadUrl, {
-      method: "PUT",
-      headers: { "Content-Type": file.type },
-      body: file
-    });
+    const formData = new FormData();
+
+    // S3 presigned POST requires every returned field.
+    for (const [key, value] of Object.entries(upload.fields)) {
+      formData.append(key, String(value));
+    }
+
+    // Append the file after the presigned fields.
+    formData.append("file", file);
+
+    let response;
+
+    try {
+      response = await fetch(upload.url, {
+        method: "POST",
+        body: formData
+      });
+    } catch {
+      throw new Error(
+        "Could not upload to S3. Check S3 CORS and network access."
+      );
+    }
 
     if (!response.ok) {
-      throw new Error(`Document upload failed (${response.status}).`);
+      throw new Error(
+        `S3 document upload failed (${response.status}).`
+      );
     }
 
     return { uploaded: true };
@@ -212,9 +336,10 @@ window.DayOneAPI = (() => {
   return Object.freeze({
     getCognitoSession,
     getAuthToken,
-    request,
-    getProgress,
+    request: requestUrl,
+    createEmployee,
     getEmployees,
+    getProgress,
     completeStage,
     createUploadUrl,
     uploadDocument

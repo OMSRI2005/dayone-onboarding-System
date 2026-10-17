@@ -16,9 +16,13 @@
 
       <nav aria-label="HR navigation">
         <a class="nav-link active" href="admin.html">Dashboard</a>
+        <a class="nav-link" href="#add-employee-card">Add Employee</a>
         <a class="nav-link" href="#employees">Employees</a>
         <a class="nav-link" href="#employees">Onboarding status</a>
-        <a class="nav-link logout-link" href="index.html" id="logout-link"><span class="logout-icon" aria-hidden="true">↪</span><span>Sign Out</span></a>
+        <a class="nav-link logout-link" href="index.html" id="logout-link">
+          <span class="logout-icon" aria-hidden="true">↪</span>
+          <span>Sign Out</span>
+        </a>
       </nav>
 
       <div class="sidebar-note">
@@ -32,9 +36,9 @@
         <div>
           <span class="eyebrow">PEOPLE OPERATIONS</span>
           <h1>HR Dashboard</h1>
-          <p>Monitor employee onboarding and readiness.</p>
+          <p>Manage employee records and monitor onboarding readiness.</p>
         </div>
-        <button id="refresh-button" class="action-button primary">
+        <button id="refresh-button" class="action-button primary" type="button">
           ↻ Refresh
         </button>
       </header>
@@ -42,27 +46,97 @@
       <section class="grid-4" aria-label="Employee summary">
         <article class="card stat-card">
           <p class="muted">Total employees</p>
-          <h3 id="total-employees">3</h3>
+          <h3 id="total-employees">—</h3>
           <span class="stat-caption">Employee records</span>
         </article>
 
         <article class="card stat-card">
           <p class="muted">In progress</p>
-          <h3 id="in-progress">1</h3>
+          <h3 id="in-progress">—</h3>
           <span class="stat-caption">Onboarding underway</span>
         </article>
 
         <article class="card stat-card">
           <p class="muted">Completed</p>
-          <h3 id="completed-count">1</h3>
+          <h3 id="completed-count">—</h3>
           <span class="stat-caption">All stages completed</span>
         </article>
 
         <article class="card stat-card">
           <p class="muted">Pending review</p>
-          <h3 id="pending-review">1</h3>
+          <h3 id="pending-review">—</h3>
           <span class="stat-caption">Awaiting action</span>
         </article>
+      </section>
+
+      <section class="card" id="add-employee-card">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">NEW JOINER</span>
+            <h2>Add Employee</h2>
+            <p class="muted">Create a new employee record.</p>
+          </div>
+        </div>
+
+        <form id="add-employee-form">
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="employee-name">Full name</label>
+              <input id="employee-name" name="name" type="text"
+                     placeholder="Enter full name" maxlength="120" required>
+            </div>
+
+            <div class="form-group">
+              <label for="employee-email">Email address</label>
+              <input id="employee-email" name="email" type="email"
+                     placeholder="employee@example.com" maxlength="254" required>
+            </div>
+
+            <div class="form-group">
+              <label for="employee-department">Department</label>
+              <input id="employee-department" name="department" type="text"
+                     placeholder="e.g. Engineering" maxlength="100" required>
+            </div>
+
+            <div class="form-group">
+              <label for="employee-role">Role</label>
+              <input id="employee-role" name="role" type="text"
+                     placeholder="e.g. Software Engineer" maxlength="100" required>
+            </div>
+
+            <div class="form-group">
+              <label for="employee-manager">Manager</label>
+              <input id="employee-manager" name="manager" type="text"
+                     placeholder="Manager name" maxlength="120" required>
+            </div>
+
+            <div class="form-group">
+              <label for="employee-joining-date">Joining date</label>
+              <input id="employee-joining-date" name="joining_date"
+                     type="date" required>
+            </div>
+
+            <div class="form-group">
+              <label for="employee-employment-type">Employment type</label>
+              <select id="employee-employment-type" name="employment_type" required>
+                <option value="">Select employment type</option>
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Contract">Contract</option>
+                <option value="Intern">Intern</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="add-employee-button"
+                  class="action-button primary"
+                  type="submit">
+            + Add Employee
+          </button>
+
+          <p id="add-employee-message" class="notice"
+             role="status" aria-live="polite"></p>
+        </form>
       </section>
 
       <section class="card" id="employees">
@@ -70,9 +144,7 @@
           <div>
             <span class="eyebrow">YOUR PEOPLE</span>
             <h2>Employee onboarding</h2>
-            <p class="muted">
-              Search employee records and monitor onboarding progress.
-            </p>
+            <p class="muted">Search employee records and monitor onboarding progress.</p>
           </div>
         </div>
 
@@ -88,7 +160,7 @@
             <option value="Pending">Pending</option>
           </select>
 
-          <button id="export-button" class="action-button">
+          <button id="export-button" class="action-button" type="button">
             ↓ Export CSV
           </button>
         </div>
@@ -106,16 +178,13 @@
               </tr>
             </thead>
             <tbody id="employee-table">
-              <tr>
-                <td colspan="6">Checking access and loading employees...</td>
-              </tr>
+              <tr><td colspan="6">Loading employee records...</td></tr>
             </tbody>
           </table>
         </div>
 
-        <p id="admin-message" class="notice" role="status"
-           aria-live="polite">
-          Employee data will appear here after authentication.
+        <p id="admin-message" class="notice" role="status" aria-live="polite">
+          Checking administrator access...
         </p>
       </section>
 
